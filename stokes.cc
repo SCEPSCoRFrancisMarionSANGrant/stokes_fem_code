@@ -233,8 +233,8 @@ void StokesProblem<dim>::set_pressure_constraint()
 
   unsigned int bdy_x_equal_0 = 1;
   unsigned int bdy_y_equal_0 = 2;
-  unsigned int bdy_x_equal_1 = 3;
-  unsigned int bdy_y_equal_1 = 4;
+  //unsigned int bdy_x_equal_1 = 3;
+  //unsigned int bdy_y_equal_1 = 4;
 
   bdy_indic_x_equal_zero.insert(bdy_x_equal_0);
   bdy_indic_y_equal_zero.insert(bdy_y_equal_0);
@@ -275,7 +275,7 @@ void StokesProblem<dim>::setup_system()  // set matrices and right-hand side
 {
   sparsity_pattern.reinit (dof_handler.n_dofs(),
                            dof_handler.n_dofs(),
-                           dof_handler.max_coupling_between_dofs());
+                           dof_handler.max_couplings_between_dofs());
 
   DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
 
@@ -402,7 +402,7 @@ void StokesProblem<dim>::assemble_system()
   component_mask[dim] = false;
 
   const unsigned int bdy_x_equal_0 = 1;
-  const unsigned int bdy_y_eqyal_0 = 2;
+  const unsigned int bdy_y_equal_0 = 2;
   const unsigned int bdy_x_equal_1 = 3;
   const unsigned int bdy_y_equal_1 = 4;
 
@@ -444,7 +444,7 @@ template <int dim>
 void StokesProblem<dim>::stokes_solve()
 {
   SparseDirectUMFPACK A_direct;
-  A_direct.intialize(system_matrix);
+  A_direct.initialize(system_matrix);
 
   A_direct.vmult(solution, system_rhs);
 
