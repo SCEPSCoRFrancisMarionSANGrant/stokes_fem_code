@@ -450,6 +450,58 @@ void StokesProblem<dim>::stokes_solve()
 
 }
 
+template <int dim>
+void StokesProblem<dim>::compute_errors()
+{
+  // component masks
+  const ComponentSelectFunction<dim>
+    pressure_mask (dim, dim+1);
+  const ComponentSelectFunction<dim>
+    velocity_mask(std::make_pair(0,dim), dim+1);
+
+  StokesExactSolution<dim> exact_solution;
+
+  QTrapez<1>  q_trapez;
+  QIterated<dim> quadrature (q_trapez, degree+2);
+
+  // vector to collect error calculations for each cell
+  Vector<double> cellwise_errors (triangulation.n_active_cells());
+
+  VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+                                     cellwise_errors, quadrature,
+                                     VectorTools::L2_norm,
+                                     &pressure_mask);
+  const double p_l2_error = cellwise_errors.l2_norm();
+
+  VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+                                     cellwise_errors, quadrature,
+                                     VectorTools::L2_norm,
+                                     &velocity_mask);
+  const double u_l2_error = cellwise_errors.l2_norm();
+
+  VectorTools::integrate_difference (dof_handler, solution, exact_solution,
+                                     cellwise_errors, quadrature,
+                                     VectorTools::H1_seminorm,
+                                     &velocity_mask);
+  
+  const double u_h1_error = cellwise_errors.l2_norm();
+
+  std::cout << "Errors: ||e_p||_L2 = " << p_l2_error
+            << ",  ||e_u||_L2 = " << u_l2_error
+            << ",  ||e_u||_H1 = " << u_h1_error
+            << std::endl;
+
+  const unsigned int n_active_cells = triangulation.n_active_cells();
+  const unsigned int n_dofs         = dof_handler.n_dofs();
+  const unsigned int dofs_per_cell  = fe.dofs_per_cell;
+
+  std::cout << "  Number of active cells:      " << n_active_cells
+            << std::endl
+            << "  Number of degrees of freedom: " << n_dofs << std::endl
+            << "  Degrees of freedom per cell:  " << dofs_per_cell
+            << std::endl;
+
+}
 
 template <int dim>
 void StokesProblem<dim>::run()
