@@ -40,6 +40,83 @@
 
 using namespace dealii;
 
+template <int dim>
+class StokesExactSolution : public Function<dim>
+{
+  public:
+    StokesExactSolution () : Function<dim>(dim+1) {}
+
+    virtual void vector_value (const Point<dim> &p,
+                                 Vector<double>  &value) const;
+    Tensor<1,dim> gradient(const Point<dim> &p,
+                           const unsigned int component) const;
+
+};
+
+template <int dim>
+void
+StokesExactSolution<dim>::vector_value (const Point<dim> &p,
+                                  Vector<double>   &values) const
+{
+  Assert (values.size() == dim+1,
+          ExcDimensionMismatch (values.size(), dim+1));
+
+  double x = p[0];
+  double y = p[1];
+
+  values(0) = cos(M_PI*x);
+  values(1) = y*M_PI*sin(M_PI*x);
+  values(2) = x*x*y*y;
+
+}
+
+template <int dim>
+Tensor<1,dim>
+StokesExactSolution<dim>::gradient(const Point<dim> &p,
+                             const unsigned int component) const
+{
+  //Recall the exact solution is
+  // double constant = 40.0;
+  // u_1(x,y) = values(0) = cos(M_PI*x);
+  // u_2(x,y) = values(1) = y*M_PI*sin(M_PI*x);
+  // p(x,y)   = values(2) = x*x*y*y;
+  //
+  // Note that
+  //   div u(x,y) = u_{1,x} + u_{2,y}
+  //              = -M_PI*sin(M_PI*x) + M_PI*sin(M_PI*x)
+  //              = 0
+  //   grad u(x,y) = [grad u_{1} ; grad u_{2} ]  
+  //               = [u_{1,x}  u_{1,y}  ; u_{2,x}   u_{2,y}]
+  //               = [-M_PI*sin(M_PI*x)   0 ; y*M_PI*M_PI*cos(M_PI*x)   M_PI*sin(M_PI*x)]
+  //   grad p(x,y) = <p_x      ,      p_y>
+  //               = <2*x*y*y  ,      2*x*x*y>
+  double x = p[0];
+  double y = p[1];
+
+  Tensor<1,dim> return_value;
+
+  switch(component){
+    case 0:  // gradient of 1st component of velocity
+      return_value[0] = -M_PI*sin(M_PI*x);      // u_{1,x}
+      return_value[1] = 0.;                     // u_{1,y}
+      return return_value;
+      break;
+    case 1:  // gradient of 2nd component of velocity
+      return_value[0] = y*M_PI*M_PI*cos(M_PI*x);      // u_{2,x}
+      return_value[1] = M_PI*sin(M_PI*x);             // u_{2,y}
+      return return_value;
+      break;
+    case 2:
+      return_value[0] = 2*x*y*y;
+      return_value[1] = 2*x*x*y;
+      return return_value;
+      break;
+    default:
+      Assert(false, ExcNotImplemented());
+  }
+
+}
+
 
 
 template<int dim>
