@@ -583,15 +583,74 @@ void StokesProblem<dim>::compute_errors()
 template <int dim>
 void StokesProblem<dim>::run()
 {
+  // number of global refinements to peform on domain [0,1] with initially 4 cells
+  // we increment to test convergence rates
+  const unsigned int n_refinements = 3;
 
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << " Setting up domain and mesh..." << std::endl;
   make_grid();
-  set_boundary();
-  setup_dofs();
-  set_pressure_constraint();
-  setup_system();
-  assemble_system();
-  stokes_solve();
+  std::cout << " Completed Setting up domain and mesh..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
 
+  std::cout << " Setting up boundary identifies..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  set_boundary();
+  std::cout << " Completed Setting up boundary identifiers..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Refining the mesh globally..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  for (unsigned int i=0; i<n_refinements; ++i)
+   refine_grid();
+  std::cout << " Completed Refining the mesh globally..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Initializing DoF Handler..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  setup_dofs();
+  std::cout << " Completed Initializing DoF Handler..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Initializing DoF Handler..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  set_pressure_constraint();
+  std::cout << " Completed Initializing DoF Handler..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Setting up system pattern and size..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  setup_system();
+  std::cout << " Completed Initializing DoF Handler..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Assembling system matrix..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  assemble_system();
+  std::cout << " Completed Assembling system matrix..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Solving system..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  stokes_solve();
+  std::cout << " Completed Solving system..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+
+  std::cout << " Computing errors..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  compute_errors();
+  std::cout << " Completed Computing errors..." << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------" << std::endl;
+ 
 
 }
 
